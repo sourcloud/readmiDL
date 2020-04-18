@@ -44,6 +44,8 @@ CONTENT_TYPES = {
     "text/html; charset=UTF-8": ".html",
     "text/plain": ".txt",
     "text/plain;charset=UTF-8": ".txt",
+    "text/xml": ".xml",
+    "text/xml;charset=UTF-8": ".xml",
     "video/mp4": ".mp4"
 }
 
@@ -150,7 +152,7 @@ def downloadFile(session, item, path):
     fileName, fileUrl = item[0], item[1]
     newFile = path / (fileName + getExtension(session, fileUrl))
     if not newFile.exists(): 
-        print('Downloding: ' + str(newFile))
+        print(f'Downloding: {newFile}')
         response = tryToConnect(session, fileUrl)
         open(newFile, 'wb').write(response.content)
 
@@ -161,7 +163,7 @@ def createDirectory(path):
         path (Path): Location of directory to create
     """
     if not path.exists():
-        print('Creating directory: ' + str(path))
+        print(f'Creating directory: {path}')
         Path(path).mkdir(parents=True, exist_ok=True)
 
 
