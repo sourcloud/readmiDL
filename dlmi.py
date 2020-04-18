@@ -11,7 +11,6 @@ try:
 except ImportError:
     PARSER = 'html.parser'
 
-
 CURRENT_DIRECTORY = Path(__file__).parent
 
 BASE_URL = 'https://read.mi.hs-rm.de/'
@@ -31,29 +30,39 @@ COURSE_URL = 'https://read.mi.hs-rm.de/ilias.php'\
 
 CONTENT_TYPES = {
     "application/java-archive": ".jar",
-    "application/java-archiver": ".jar",
+    "application/octet-stream": ".dtd",
     "application/pdf": ".pdf",
     "application/postscript": ".eps",
+    "application/xml": ".xml",
+    "application/x-tex": ".tex",
     "application/zip": ".zip",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+    "image/svg+xml": ".svg",
     "image/jpeg": ".jpg",
     "image/png": ".png",
+    "text/html": ".html",
+    "text/html; charset=UTF-8": ".html",
     "text/plain": ".txt",
     "text/plain;charset=UTF-8": ".txt",
     "video/mp4": ".mp4"
 }
 
 
-def tryToConnect(session, url, stream=False, maxTries=5):
+def tryToConnect(session, url, maxTries=5):
     """
-    Try to establish connection to given url.
+    Args:
+        session (Session): Valid readmi session
+        url (string): Url to connect to
+        maxTries (int): Maximum number of tries in case of failure
+    Returns:
+        Session: Session of readmi
     """
     tryCount = 0
     statusCode = 0
     response = None
     while tryCount < maxTries and statusCode != 200:
         tryCount += 1
-        response = session.get(url, stream = stream)
+        response = session.get(url)
         statusCode = response.status_code
     return response if statusCode == 200 else None
 
