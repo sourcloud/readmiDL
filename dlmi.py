@@ -136,14 +136,15 @@ def crawl(session, url=COURSE_URL, path=CURRENT_DIRECTORY):
             downloadFile(session, item, path)
 
         # Process links
-        elif any(keyword in itemUrl for keyword in ['calldirectlink', 'Wiki']):
+        elif any(keyword in itemUrl for keyword in ['directlink', 'Wiki', 'showThreads', 'ExerciseHandler']):
             forwardedUrl = getForwardedLink(session, itemUrl)
-            createTextFile(itemName, forwardedUrl, path)
+            createLink(itemName, forwardedUrl, path)
 
         # Process directories
         else:
             newPath = path / itemName
             createDirectory(newPath)
+            print(f'Checking {itemName}')
             crawl(session, itemUrl, newPath)
 
 
@@ -159,7 +160,9 @@ def downloadFile(session, item, path):
     if not newFile.exists(): 
         print(f'Downloding: {newFile}')
         response = tryToConnect(session, fileUrl)
-        open(newFile, 'wb').write(response.content)
+        file = open(newFile, 'wb')
+        file.write(response.content)
+        file.close()
 
 
 def getForwardedLink(session, url):
@@ -170,23 +173,23 @@ def getForwardedLink(session, url):
     Returns:
         (string) Target url
     """
-    response = session.get(url)
+    response = tryToConnect(session, url)
     return response.url
 
 
 
-def createTextFile(name, url, path):
+def createLink(name, url, path):
     """
     Args:
         name (string): Name of the file
         url (string): Url that will be written in file
-        path (Path): Location where file should be created
+        path (Path): Location where file will be created
     """
-    newFile = path / (name + '.txt')
+    newFile = path / (name + '.html')
     if not newFile.exists():
         print(f'Creating: {newFile}')
         file = open(newFile, 'w')
-        file.write(url)
+        file.write(f'<html><body><script type="text/javascript">window.location.href="{url}"</script></body></html>')
         file.close()
 
 
