@@ -29,24 +29,24 @@ COURSE_URL = 'https://read.mi.hs-rm.de/ilias.php'\
              '&cmd=jumpToMemberships'
 
 CONTENT_TYPES = {
-    "application/java-archive": ".jar",
-    "application/octet-stream": ".dtd",
-    "application/pdf": ".pdf",
-    "application/postscript": ".eps",
-    "application/xml": ".xml",
-    "application/x-tex": ".tex",
-    "application/zip": ".zip",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
-    "image/svg+xml": ".svg",
-    "image/jpeg": ".jpg",
-    "image/png": ".png",
-    "text/html": ".html",
-    "text/html; charset=UTF-8": ".html",
-    "text/plain": ".txt",
-    "text/plain;charset=UTF-8": ".txt",
-    "text/xml": ".xml",
-    "text/xml;charset=UTF-8": ".xml",
-    "video/mp4": ".mp4"
+    'application/java-archive': '.jar',
+    'application/octet-stream': '.dtd',
+    'application/pdf': '.pdf',
+    'application/postscript': '.eps',
+    'application/xml': '.xml',
+    'application/x-tex': '.tex',
+    'application/zip': '.zip',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+    'image/svg+xml': '.svg',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'text/html': '.html',
+    'text/html; charset=UTF-8': '.html',
+    'text/plain': '.txt',
+    'text/plain;charset=UTF-8': '.txt',
+    'text/xml': '.xml',
+    'text/xml;charset=UTF-8': '.xml',
+    'video/mp4': '.mp4'
 }
 
 
@@ -135,6 +135,11 @@ def crawl(session, url=COURSE_URL, path=CURRENT_DIRECTORY):
         if 'download' in itemUrl:
             downloadFile(session, item, path)
 
+        # Process links
+        elif any(keyword in itemUrl for keyword in ['calldirectlink', 'Wiki']):
+            forwardedUrl = getForwardedLink(session, itemUrl)
+            createTextFile(itemName, forwardedUrl, path)
+
         # Process directories
         else:
             newPath = path / itemName
@@ -157,6 +162,34 @@ def downloadFile(session, item, path):
         open(newFile, 'wb').write(response.content)
 
 
+def getForwardedLink(session, url):
+    """
+    Args:
+        session (Session): Valid readmi session
+        url (string): Forwarding url
+    Returns:
+        (string) Target url
+    """
+    response = session.get(url)
+    return response.url
+
+
+
+def createTextFile(name, url, path):
+    """
+    Args:
+        name (string): Name of the file
+        url (string): Url that will be written in file
+        path (Path): Location where file should be created
+    """
+    newFile = path / (name + '.txt')
+    if not newFile.exists():
+        print(f'Creating: {newFile}')
+        file = open(newFile, 'w')
+        file.write(url)
+        file.close()
+
+
 def createDirectory(path):
     """
     Args:
@@ -172,10 +205,12 @@ def getExtension(session, url):
     Args:
         session (Session): Valid readmi session
         url (string): Url to file that's extension shall be found
+    Returns:
+        (string) File extension of content-type
     """
     response = session.head(url)
     contentType = response.headers['content-type']
-    return CONTENT_TYPES.get(contentType, "")
+    return CONTENT_TYPES.get(contentType, '')
        
 
 def console():
