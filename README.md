@@ -33,19 +33,19 @@ Following example shows the expected kind of directory structure after the scrip
 ├── README.md
 ├── first course
     ├── subdirectory 1
-	    ├── file.pdf
-	    └── other_file.pdf
-	└── subdirectory 2
-		└── example.zip
+	├── file.pdf
+	└── other_file.pdf
+    └── subdirectory 2
+	└── example.zip
 ├── second course
-	├── overview.pdf
-	└── examples
-		├── archive
-			└── old_example.py
-		├── some_file_in_between.txt
-		└── current
-			└── new_example.java
+    ├── overview.pdf
+    └── examples
+	├── archive
+	    └── old_example.py
+	├── some_file_in_between.txt
+	└── current
+	    └── new_example.java
 └── third course
-	└── nothing2see.mp4
+    └── nothing2see.mp4
 ```
 
